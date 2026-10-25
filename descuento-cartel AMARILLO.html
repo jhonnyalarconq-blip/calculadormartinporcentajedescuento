@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calcular % de descuento</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23eab308%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23facc15%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27%20fill%3D%27url%28%23g%29%27%2F%3E%3Ctext%20x%3D%2732%27%20y%3D%2747%27%20text-anchor%3D%27middle%27%20font-family%3D%27Arial%2CHelvetica%2Csans-serif%27%20font-weight%3D%27900%27%20font-size%3D%2742%27%20fill%3D%27%233b2a00%27%3E%25%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;
+  --c1:#854d0e;--c2:#ca8a04;--c3:#facc15;--c4:#eab308;
+  --ink:#1f2328;--dark:#3b2a00;--mut:#6b7280;--line:#e7e5e4;--fill:#f6f4ee;--bg:#f3f1ec;
+  --ring:rgba(202,138,4,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Roboto',Arial,sans-serif}
+body{background:var(--bg);min-height:100vh;padding:max(12px,env(safe-area-inset-top)) 12px max(30px,env(safe-area-inset-bottom))}
+.hidden{display:none!important}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+/* barra superior */
+.hero{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;background:linear-gradient(135deg,var(--c4),var(--c3));color:var(--dark);border-radius:16px;padding:12px 14px;text-align:center;box-shadow:0 6px 18px rgba(202,138,4,.28)}
+.hero .htt{grid-column:2;grid-row:1;min-width:0}
+.hero h1{font-size:clamp(18px,4.6vw,26px);font-weight:900;line-height:1.1;text-transform:uppercase}
+.hero .sub{font-size:12px;font-style:italic;font-weight:500;opacity:.85;margin-top:6px}
+.hb{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;line-height:1;text-decoration:none;white-space:nowrap;border-radius:999px;padding:8px 13px;cursor:pointer}
+.hb.back{grid-column:1;grid-row:1;justify-self:start;color:var(--dark);background:rgba(255,255,255,.4);border:1.5px solid var(--dark)}
+.hb.back:hover{background:rgba(255,255,255,.65)}
+.hb.nuevo{grid-column:3;grid-row:1;justify-self:end;background:var(--dark);color:#fff;border:none;box-shadow:0 2px 6px rgba(0,0,0,.22)}
+.hb.nuevo:hover{background:#523b00}
+.hb svg{width:17px;height:17px;flex:none}
+.hb:focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media(max-width:760px){.hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hero .htt{grid-column:1/-1;grid-row:2;width:100%}.hb.nuevo{grid-column:2}}
+
+/* tarjetas */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.res{justify-content:center}
+@media(max-width:700px){.grid{grid-template-columns:minmax(0,1fr)}.res{justify-content:flex-start}}
+.card{background:#fff;border-radius:16px;box-shadow:0 2px 14px rgba(31,35,40,.07);padding:18px;display:flex;flex-direction:column;gap:14px}
+.card.hl{border:2px solid var(--c4);padding:16px;box-shadow:0 4px 18px rgba(202,138,4,.16)}
+.sec{display:flex;align-items:center;gap:10px;font-weight:900;font-size:15px;color:var(--ink);text-transform:uppercase;letter-spacing:.3px}
+.sec .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--c2);color:#fff;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+.sec small{font-size:12px;font-weight:500;color:var(--mut);text-transform:none;letter-spacing:0;margin-left:auto;text-align:right}
+
+/* casilleros */
+.fg{display:flex;flex-direction:column;gap:6px}
+.lb{font-size:12.5px;color:var(--mut);font-weight:700}
+.inp{display:flex;align-items:center;border:1.5px solid #d6d3d1;border-radius:10px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.inp:focus-within{border-color:var(--c2);box-shadow:0 0 0 4px var(--ring)}
+.inp input{width:100%;min-width:0;border:none;padding:9px 6px 9px 8px;font-size:22px;font-weight:700;outline:none;color:var(--ink);background:transparent}
+.inp input::placeholder{color:#c4c0bc;font-weight:500}
+.inp .pre{padding:0 0 0 14px;font-weight:800;color:var(--mut);font-size:18px}
+
+/* cartel dibujado */
+.cart{position:relative;padding-bottom:12px}
+.glass{background:linear-gradient(160deg,#f4f8fb,#dfe8ee);border-radius:6px 6px 2px 2px;padding:9px 10px 10px;box-shadow:0 3px 10px rgba(0,0,0,.14),inset 0 0 0 1px rgba(255,255,255,.8)}
+.plate{background:#b9c6d1;border:2.5px solid #0a0a0a;border-radius:7px;overflow:hidden}
+.plate .tt{background:#0a0a0a;color:#fff;text-align:center;font-weight:900;font-size:clamp(14px,4.2vw,18px);letter-spacing:.5px;padding:5px 6px 6px;text-transform:uppercase}
+.plate .bd{padding:9px 11px 11px}
+.cell{display:flex;align-items:center;justify-content:center;background:#f1f0d6;border-radius:3px;box-shadow:0 2px 3px rgba(0,0,0,.25),inset 0 0 0 1px rgba(255,255,255,.7);padding:2px 10px;transition:box-shadow .15s}
+.cell:focus-within{box-shadow:0 0 0 4px var(--ring),0 2px 3px rgba(0,0,0,.25)}
+.cell .pre{font-weight:900;font-size:clamp(18px,5vw,22px);color:#0a0a0a}
+.cell input{width:100%;min-width:0;border:none;background:transparent;outline:none;text-align:center;font-size:clamp(24px,7vw,30px);font-weight:900;color:#0a0a0a;padding:5px 2px}
+.cell input::placeholder{color:#c9c7a3}
+.base{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:60%;height:12px;background:linear-gradient(#f8fafb,#dfe6ea);border-radius:0 0 6px 6px;box-shadow:0 4px 8px rgba(0,0,0,.16)}
+
+/* resultado */
+.tile{position:relative;overflow:hidden;border-radius:14px;padding:12px 16px;text-align:center;background:linear-gradient(135deg,var(--c4),var(--c3));color:var(--dark);box-shadow:0 4px 12px rgba(202,138,4,.28)}
+.tile .tl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.tile .tv{display:flex;align-items:baseline;justify-content:center;gap:4px;line-height:1.05;margin-top:4px}
+.tile .tv span{font-weight:900;font-size:clamp(34px,9vw,46px);letter-spacing:-.5px}
+.tile .tv small{font-size:clamp(22px,6vw,28px);font-weight:900}
+.tile::after{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.95),transparent);transform:translateX(-160%) skewX(-20deg);opacity:0;pointer-events:none}
+.tile.live::after{opacity:1;animation:shine 3s ease-in-out infinite}
+.tile.live{animation:glow 1.6s ease-in-out infinite}
+.sp{position:absolute;color:#fff;font-style:normal;opacity:0;text-shadow:0 0 6px #fff,0 0 12px rgba(255,255,255,.9);pointer-events:none;line-height:1}
+.s1{top:8px;left:12%;font-size:16px}.s2{top:12px;right:10%;font-size:20px}.s3{bottom:8px;left:28%;font-size:13px}.s4{bottom:10px;right:26%;font-size:16px}
+.tile.live .sp{animation:twinkle 2s ease-in-out infinite}
+.tile.live .s2{animation-delay:.5s}.tile.live .s3{animation-delay:1s}.tile.live .s4{animation-delay:1.5s}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1.15) rotate(25deg)}}
+@keyframes shine{0%,40%{transform:translateX(-160%) skewX(-20deg)}100%{transform:translateX(360%) skewX(-20deg)}}
+@keyframes glow{0%,100%{box-shadow:0 4px 12px rgba(202,138,4,.28)}50%{box-shadow:0 0 0 4px rgba(250,204,21,.6),0 0 22px rgba(250,204,21,.8)}}
+@keyframes pop{0%{transform:scale(1.08)}100%{transform:scale(1)}}
+.tv span.pop{display:inline-block;animation:pop .35s ease-out}
+.info{background:var(--fill);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:500;color:var(--mut);line-height:1.5;text-align:center}
+.info b{color:var(--ink);font-weight:700}
+.warn{background:#fff1f2;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600;color:#be123c;line-height:1.4}
+
+/* aprender */
+.learn{width:100%;background:#fff;border-radius:16px;padding:10px;box-shadow:0 2px 14px rgba(31,35,40,.07)}
+.learn summary{list-style:none;cursor:pointer;background:var(--fill);border-radius:12px;padding:12px 14px;font-weight:800;font-size:15px;color:var(--c1);display:flex;justify-content:space-between}
+.learn summary::-webkit-details-marker{display:none}
+.learn summary::after{content:"⌄";font-size:18px}.learn[open] summary::after{content:"⌃"}
+.lh{font-size:12.5px;font-weight:700;color:var(--mut);margin:12px 2px 8px}
+.steps{list-style:none;display:flex;flex-direction:column;gap:8px}
+.steps li{display:flex;gap:10px;align-items:flex-start;background:var(--fill);border-radius:10px;padding:9px 11px;font-size:13.5px;color:#374151;line-height:1.45}
+.steps .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--c2);color:#fff;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+.steps b{color:var(--c1)}.steps .st{display:block;font-weight:900;color:var(--ink);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.banner{width:100%;max-width:560px;margin:0 auto;border-radius:10px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <a class="hb back" href="https://capacitacion3vesmartin-ves.github.io/campuscapacitacion/" target="_top">‹ Volver al Campus</a>
+    <div class="htt"><h1>Calcular % de descuento</h1><div class="sub">By: Capacitación V.E.S.</div></div>
+    <button type="button" class="hb nuevo" onclick="nuevoCalculo()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20.5 3.5v4.2h-4.2"/><path d="M12 9v6M9 12h6"/></svg>Nuevo cálculo</button>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+    <section class="card hl">
+      <div class="sec"><span class="n">1</span>Precio del sistema<small>el que sale en el Oracle</small></div>
+      <div class="fg"><label class="lb" for="ps">Precio que dice el sistema</label><div class="inp"><span class="pre">S/</span><input type="number" id="ps" step="any" min="0" placeholder="0.00" inputmode="decimal" onfocus="this.select()" oninput="lim(this);calc()"></div></div>
+    </section>
+
+    <section class="card hl">
+      <div class="sec"><span class="n">2</span>Precio del cartel<small>el que ya trae el descuento</small></div>
+      <div class="cart">
+        <div class="glass"><div class="plate"><div class="tt">Precio con dscto.</div><div class="bd"><label class="cell"><span class="pre">S/</span><input type="number" id="pc" step="any" min="0" placeholder="0.00" inputmode="decimal" aria-label="Precio con descuento que dice el cartel" onfocus="this.select()" oninput="lim(this);calc()"></label></div></div></div>
+        <div class="base"></div>
+      </div>
+    </section>
+    </div>
+
+  <section class="card hl res">
+    <div class="sec"><span class="n">3</span>Resultado</div>
+    <div class="tile" id="tile"><i class="sp s1">✦</i><i class="sp s2">✦</i><i class="sp s3">✦</i><i class="sp s4">✦</i><div class="tl">Descuento a aplicar</div><div class="tv"><span id="m-p">0</span><small>%</small></div></div>
+    <div class="warn hidden" id="warn"></div>
+    <div class="info" id="chk">Escribe los dos precios para ver el descuento.</div>
+  </section>
+  </div>
+
+  <details class="learn" id="lrn"><summary>📘 Aprender cómo se calcula</summary><div id="lrn-b"></div></details>
+  <img class="banner" alt="Capacitación VES" onerror="this.style.display='none'" src="https://image2url.com/r2/default/images/1774306178454-b0969afe-ce2f-4f2e-9e3f-aacfb880f5a9.jpg">
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const num=id=>parseFloat($(id).value)||0;
+const r6=x=>Math.round(x*1e6)/1e6;
+const f2=x=>x.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fp=x=>(Math.round(x*100)/100).toLocaleString('es-PE',{minimumFractionDigits:0,maximumFractionDigits:2});
+function lim(e){let v=e.value;while(v.replace(/[.\-]/g,'').length>8)v=v.slice(0,-1);if(v!==e.value)e.value=v}
+
+function explain(own,v){
+  const st=[];
+  st.push(['Cuánto baja el precio','S/ '+f2(v.S)+' − S/ '+f2(v.C)+' = <b>S/ '+f2(v.d)+'</b>']);
+  st.push(['Qué parte del precio del sistema es','S/ '+f2(v.d)+' ÷ S/ '+f2(v.S)+' = <b>'+String(r6(v.d/v.S))+'</b>']);
+  st.push(['Pasarlo a porcentaje',String(r6(v.d/v.S))+' × 100 = <b>'+fp(v.p)+'%</b> de descuento']);
+  $('lrn-b').innerHTML='<div class="lh">'+(own?'Con tus precios':'Ejemplo: el sistema dice S/ 100.00 y el cartel dice S/ 87.50 (escribe tus precios para verlo con ellos)')+'</div><ol class="steps">'+st.map((x,i)=>'<li><span class="n">'+(i+1)+'</span><div><span class="st">'+x[0]+'</span>'+x[1]+'</div></li>').join('')+'</ol>';
+}
+
+function calc(){
+  const S=num('ps'),C=num('pc'),w=$('warn');
+  const ok=S>0&&C>0&&C<=S;
+  const p=ok?(S-C)/S*100:0;
+  const e=$('m-p');e.textContent=ok?fp(p):'0';e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop');
+  $('tile').classList.toggle('live',ok);
+  if(S>0&&C>S){w.textContent='⚠ El precio del cartel es mayor que el del sistema, así que no hay descuento. Revisa los precios.';w.classList.remove('hidden')}
+  else w.classList.add('hidden');
+  if(ok){
+    const fin=Math.round(S*(1-Math.round(p*100)/10000)*100)/100;
+    $('chk').innerHTML='Comprobación: S/ '+f2(S)+' con <b>'+fp(p)+'%</b> de descuento = <b>S/ '+f2(fin)+'</b>'+(Math.abs(fin-C)>0.005?'<br>(el cartel dice S/ '+f2(C)+'; la diferencia viene de redondear el porcentaje)':'');
+    explain(true,{S,C,d:S-C,p});
+  }else{
+    $('chk').textContent='Escribe los dos precios para ver el descuento.';
+    explain(false,{S:100,C:87.5,d:12.5,p:12.5});
+  }
+}
+calc();
+function nuevoCalculo(){
+  ['ps','pc'].forEach(id=>{$(id).value=''});
+  $('lrn').open=false;calc();
+  window.scrollTo({top:0,left:0,behavior:'instant'});
+  $('ps').focus({preventScroll:true});
+}
+</script>
+</body>
+</html>
