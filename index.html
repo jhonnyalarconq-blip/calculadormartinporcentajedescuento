@@ -84,6 +84,10 @@ body{background:var(--bg);min-height:100vh;padding:max(12px,env(safe-area-inset-
 .tv span.pop{display:inline-block;animation:pop .35s ease-out}
 .info{background:var(--fill);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:500;color:var(--mut);line-height:1.5;text-align:center}
 .info b{color:var(--ink);font-weight:700}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button{border:1.5px solid #d6d3d1;background:#fff;border-radius:10px;padding:11px 8px;font-size:14px;font-weight:800;color:var(--mut);cursor:pointer;transition:all .15s}
+.seg button.on{background:var(--c4);border-color:var(--c2);color:var(--dark);box-shadow:0 0 0 3px var(--ring)}
+.seg button:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
 .warn{background:#fff1f2;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600;color:#be123c;line-height:1.4}
 
 /* aprender */
@@ -111,7 +115,8 @@ body{background:var(--bg);min-height:100vh;padding:max(12px,env(safe-area-inset-
     <div class="col">
     <section class="card hl">
       <div class="sec"><span class="n">1</span>Precio del sistema<small>el que sale en el Oracle</small></div>
-      <div class="fg"><label class="lb" for="ps">Precio que dice el sistema</label><div class="inp"><span class="pre">S/</span><input type="number" id="ps" step="any" min="0" placeholder="0.00" inputmode="decimal" onfocus="this.select()" oninput="lim(this);calc()"></div></div>
+      <div class="fg"><label class="lb" for="ps" id="lb-ps">Precio que dice el sistema</label><div class="inp"><span class="pre">S/</span><input type="number" id="ps" step="any" min="0" placeholder="0.00" inputmode="decimal" onfocus="this.select()" oninput="lim(this);onPs()"></div></div>
+      <div class="seg" role="group" aria-label="Tamaño de la plancha"><button type="button" id="b-ent" class="on" aria-pressed="true" onclick="setTam('ent')">Plancha entera</button><button type="button" id="b-med" aria-pressed="false" onclick="setTam('med')">Media plancha</button></div>
     </section>
 
     <section class="card hl">
@@ -138,6 +143,7 @@ body{background:var(--bg);min-height:100vh;padding:max(12px,env(safe-area-inset-
 <script>
 const $=id=>document.getElementById(id);
 const num=id=>parseFloat($(id).value)||0;
+let tam='ent';
 const r6=x=>Math.round(x*1e6)/1e6;
 const f2=x=>x.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fp=x=>(Math.round(x*100)/100).toLocaleString('es-PE',{minimumFractionDigits:0,maximumFractionDigits:2});
@@ -151,6 +157,17 @@ function explain(own,v){
   $('lrn-b').innerHTML='<div class="lh">'+(own?'Con tus precios':'Ejemplo: el sistema dice S/ 100.00 y el cartel dice S/ 87.50 (escribe tus precios para verlo con ellos)')+'</div><ol class="steps">'+st.map((x,i)=>'<li><span class="n">'+(i+1)+'</span><div><span class="st">'+x[0]+'</span>'+x[1]+'</div></li>').join('')+'</ol>';
 }
 
+let pEnt=0;
+function onPs(){const v=num('ps');pEnt=tam==='med'?v*2:v;calc()}
+function setTam(t){
+  if(t===tam)return;
+  tam=t;
+  $('b-ent').classList.toggle('on',t==='ent');$('b-med').classList.toggle('on',t==='med');
+  $('b-ent').setAttribute('aria-pressed',t==='ent');$('b-med').setAttribute('aria-pressed',t==='med');
+  const v=t==='med'?Math.round(pEnt*50)/100:pEnt;
+  $('ps').value=v>0?String(v):'';
+  calc();
+}
 function calc(){
   const S=num('ps'),C=num('pc'),w=$('warn');
   const ok=S>0&&C>0&&C<=S;
@@ -170,7 +187,7 @@ function calc(){
 }
 calc();
 function nuevoCalculo(){
-  ['ps','pc'].forEach(id=>{$(id).value=''});
+  ['ps','pc'].forEach(id=>{$(id).value=''});tam='ent';pEnt=0;$('b-ent').classList.add('on');$('b-med').classList.remove('on');$('b-ent').setAttribute('aria-pressed','true');$('b-med').setAttribute('aria-pressed','false');
   $('lrn').open=false;calc();
   window.scrollTo({top:0,left:0,behavior:'instant'});
   $('ps').focus({preventScroll:true});
